@@ -23,7 +23,7 @@ def Init(VarKind, Samples, Cuts=True):
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
     #   F i n d   R O O T   V a r i a b l e s                                                                                                           #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
-    tree                  = 'nominal_Loose'
+    tree                    = 'nominal_Loose'
     MC_Channel_tttt         = "mcChannelNumber==412115"                                             #LO 412115 NLO 412043
     MC_Channel_NLO          = "mcChannelNumber==412043"
     MC_Channel_ttW          = ""
@@ -188,7 +188,7 @@ def Init(VarKind, Samples, Cuts=True):
     #   S a v e   D a t a   a s   a   D I A n a S e t u p   C l a s s   I n s t a n c e                                                                 #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 
-    # class             | DIAnaSetup( Path,              Tree,   McChannel,               LVars,             WeightList,  Name,             Cuts)
+    # class             | DIAnaSetup( Path,              Tree,   McChannel,                 LVars,             WeightList,  Name,             Cuts)
     # --------------------------------------------------------------------------------------------------------------------------------------------------
     NLOSample           = DIAnaSetup( Path_tttt,         tree,   MC_Channel_NLO,            listOfVariables,   WeightNLO,   'NLO',            Cuts      )
     ttttSample          = DIAnaSetup( Path_tttt,         tree,   MC_Channel_tttt,           listOfVariables,   WeightLO,    'tttt',           Cuts      )
@@ -226,7 +226,7 @@ def Init(VarKind, Samples, Cuts=True):
                               ttbar_othersSample,   ttbar_lightSample,   ttbar_HFSample,   ttbar_COSample,   ttbar_QmisSample,   ttHSample,
                               ttZSample,            ttWWSample,          ttWSample]
     
-     else:
+    else:
         Samples = [s for s in LSamples if s.Name in Samples]
 
     return Samples

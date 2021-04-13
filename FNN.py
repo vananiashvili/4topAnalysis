@@ -51,7 +51,7 @@ Bootstrap  = ('test', None)                                                     
 # LearnRate = DIClasses.DILrSchedule('cycle',0.005,cycle='triangular',MinLr=0.001,StepSize=400.,factor=0.9)
 
 LearnRate = DIClasses.DILrSchedule('normal', 0.001)                                                               # DILrSchedule(mode, Lr, factor=1., cycle='triangular', MinLr=0.006, StepSize=0)
-                                                                                                                  #    modes = {cycle,poly,drop,normal}
+                                                                                                                  #    modes = {cycle, poly, drop, normal}
                                                                                                                   #    Lr = Initial learnrate or max learnrate (cycle)
                                                                                                                   #    cycle = {triangular, triangular2, exp_range(factor=gamma)}
 

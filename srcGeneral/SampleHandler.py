@@ -4,9 +4,11 @@ import numpy as np
 from math import sqrt
 import PlotService
 from DIClasses import DISample, DIDataSet
-import Utils, os
+import Utils
+import os
 from root_numpy import tree2array, root2array, array2root
 from sklearn.model_selection import train_test_split
+
 
 
 class SampleHandler:                                                                                              # Used in FNN.py[81]
@@ -17,35 +19,28 @@ class SampleHandler:                                                            
     SequenceLength  = 1
     Plots           = False
 
-    def __init__(self, ListAnaSetup, mode='Slow', Single=False):
-        
-        self.ListAnaSetup = ListAnaSetup
-        self.mode         = mode
-        self.Single       = Single
+    def __init__(self, ListAnaSetup, mode='Slow', Single=False):                                                  # Sampler = SampleHandler(ListSamples, mode=Mode+ModelName) 
+                                                                                                                  #     ListSamples = DIClasses.Init(ModelName, Samples, Cuts=True)
+        self.ListAnaSetup = ListAnaSetup                                                                          #                                 ('FNN18', 'nomLoose')
+        self.mode         = mode                                                                                  #     mode = Mode + ModelName = 'slowFNN18'
+        self.Single       = Single                                                                                # ? ? ? ? ?
 
 
-    def GetANNInput(self, verbose=1):
+    def GetANNInput(self):
 
+        # SLOW or SAVE Modes  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ # 
         if self.mode[:4] == 'Slow' or self.mode[:4] == 'Save':
             
-            self.verbose = verbose
+            Utils.stdinfo("Setting up input vectors")
             
-            if self.verbose == 1:
-                Utils.stdinfo("Setting up input vectors")
-
-            
-            # Import Variables as an numpy array
+            # Import Variables as a NumPy array 
             for DISetup in self.ListAnaSetup:
                 
-                if self.verbose == 1:
-                    print("Processing Sample: " + DISetup.Name)
+                print("Processing Sample: " + DISetup.Name)
+                
                 ListOfVariables = DISetup.LVars[:]
-                
-                if self.mode[:4] == 'Fast' and DISetup.Name != 'NLO':
-                    ListOfVariables.append('Weight')
-                
-                else:
-                    ListOfVariables.extend(DISetup.WeightList)
+
+                ListOfVariables.extend(DISetup.WeightList)
                 
                 Arr = self.GetArray(ListOfVariables, DISetup)                                                                         # Defined below
                 
@@ -53,13 +48,11 @@ class SampleHandler:                                                            
                 
                 DISetup.Samples = self.MakeSplit(Arr, DISetup)                                                                        # Split samples
                 
-                if self.verbose == 1:
-                    self.Info(DISetup)
+                self.Info(DISetup)
                 
                         
             # Combine the different sets into a DataSet
-            if self.verbose == 1:
-                Utils.stdinfo("finalising input Preparation")
+            Utils.stdinfo("Finalising input Preparation")
             
             ListSamples = [DISetup.Samples for DISetup in self.ListAnaSetup]
             

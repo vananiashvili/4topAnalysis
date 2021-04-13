@@ -161,15 +161,13 @@ def GetSamples(SampleAndSeed, DataSet, Name, DoTrafo=False):                    
         Comb = np.hstack((Sample.Events, Sample.Weights.reshape(-1,1), Sample.OutTrue.reshape(-1,1)))             # np.hstack() stacks the sequence of input arrays horizontally (i.e. column wise)
                                                                                                                   # .reshape(-1,1) reshapes the array into an array with 1 column and necessary number of rows
         
-        Comb = resample(Comb, replace=True, n_samples=len(Comb), random_state=Seed)                               # sklearn.resample                                 
+        Comb = resample(Comb, replace=True, n_samples=len(Comb), random_state=Seed)                               # sklearn.utils.resample                                 
         
         Sample.Events = Comb[:,:-2]
         Sample.Weights = Comb[:,-2:-1].ravel()
         Sample.OutTrue = np.array(Comb[:,-1], dtype=int)
 
     return train, test, vali
-
-
 
 
 
