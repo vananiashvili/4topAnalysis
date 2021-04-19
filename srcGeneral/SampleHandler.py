@@ -26,56 +26,66 @@ class SampleHandler:                                                            
         self.Single       = Single                                                                                # ? ? ? ? ?
 
 
+
+    """ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ """
+    """   P r e p a r e   t h e   D a t a s e t                                                                   """
+    """ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ """
+    
     def GetANNInput(self):
 
         # SLOW or SAVE Modes  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ # 
         if self.mode[:4] == 'Slow' or self.mode[:4] == 'Save':
             
-            Utils.stdinfo("Setting up input vectors")
+            Utils.stdinfo("\nSetting up input vectors!\n")
             
+            print("------------------------------------------------------------------------------------------------")
+            print("   Sample         Total          Training       Testing        Validation     Yield             ")
+            print("================================================================================================")
+
+
             # Import Variables as a NumPy array 
             for DISetup in self.ListAnaSetup:
                 
-                print("Processing Sample: " + DISetup.Name)
+                print(" "*3 + DISetup.Name.ljust(15, " "), end="")
                 
                 ListOfVariables = DISetup.LVars[:]
-
                 ListOfVariables.extend(DISetup.WeightList)
                 
-                Arr = self.GetArray(ListOfVariables, DISetup)                                                                         # Defined below
+                Arr = self.GetArray(ListOfVariables, DISetup)                                                     # Defined below
+                np.random.shuffle(Arr)                                                                            # Ensures randomization of event order. Seed fixed in FNN.py[17]
                 
-                np.random.shuffle(Arr)                                                                                                # Ensures randomization of event order. Seed fixed in FNN.py[17]
+                DISetup.Samples = self.MakeSplit(Arr, DISetup)                                                    # Split samples
                 
-                DISetup.Samples = self.MakeSplit(Arr, DISetup)                                                                        # Split samples
+                self.Info(DISetup)                                                                                # Defined below: Displays the information about the sample sizes
                 
-                self.Info(DISetup)
-                
-                        
+
             # Combine the different sets into a DataSet
-            Utils.stdinfo("Finalising input Preparation")
+            Utils.stdinfo("\nFinalising input preparation!\n")
             
             ListSamples = [DISetup.Samples for DISetup in self.ListAnaSetup]
             
-            train = self.Finalise("train", ListSamples)
+            train = self.Finalise("train", ListSamples)                                                           # Defined below
             test  = self.Finalise("test", ListSamples)
             vali  = self.Finalise("validation", ListSamples)
             
             DataSet = DIDataSet(train, test, vali)
 
 
-        # Save the numpy arrays to load them faster later
-        if self.mode[:4] == 'Save':
-            if self.verbose == 1:
+            # Save the NumPy arrays to load them faster later
+            if self.mode[:4] == 'Save':
                 Utils.stdinfo("Saving data for Fast mode")
-            self.SaveNpy('TrainSet' + self.mode[4:], train)
-            self.SaveNpy('TestSet' + self.mode[4:], test)
-            self.SaveNpy('ValiSet' + self.mode[4:], vali)
+                self.SaveNpy('TrainSet' + self.mode[4:], train)
+                self.SaveNpy('TestSet'  + self.mode[4:], test)
+                self.SaveNpy('ValiSet'  + self.mode[4:], vali)
             
-        # If stored as numpy arrays load the arrays
+            
+        # FAST Mode ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
         elif self.mode[:4] == 'Fast':
+            
             train = self.GetSampleNpy('TrainSet' + self.mode[4:])
-            test = self.GetSampleNpy('TestSet' + self.mode[4:])
-            vali = self.GetSampleNpy('ValiSet' + self.mode[4:])
+            test  = self.GetSampleNpy('TestSet'  + self.mode[4:])
+            vali  = self.GetSampleNpy('ValiSet'  + self.mode[4:])
+            
             DataSet = DIDataSet(train, test, vali)
 
         # Make Plots of the Variables
@@ -86,23 +96,23 @@ class SampleHandler:                                                            
 
 
 
-# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
-#   G e t   A r r a y   f r o m   R O O T                                                                         #
-# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
+    # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
+    #   G e t   A r r a y   f r o m   R O O T                                                                     #
+    # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 
-    def GetArray(self, ListOfVariables, DISetup):                                                                                     # Used above in GetANNInput
+    def GetArray(self, ListOfVariables, DISetup):                                                                 # Used above in GetANNInput
         
         """ Import the Variables from the ROOT file """
 
         for i, path in enumerate(DISetup.Path):
             if DISetup.Cuts == '':
-                selection = DISetup.McChannel
-            elif DISetup.McChannel == '':
+                selection = DISetup.MC_Channel
+            elif DISetup.MC_Channel == '':
                 selection = DISetup.Cuts
             else:
-                selection = "(" + DISetup.McChannel + ") && (" + DISetup.Cuts + ")"
+                selection = "(" + DISetup.MC_Channel + ") && (" + DISetup.Cuts + ")"
 
-            # get the array from the tree
+            # Get the array from the ROOT tree
             rfile  = ROOT.TFile(path)
             intree = rfile.Get(DISetup.Tree)
             Arr = tree2array(intree, branches=ListOfVariables, selection=selection)
@@ -293,7 +303,7 @@ class SampleHandler:                                                            
                 for weight in Sample.Weights:
                     if weight < 0:
                         NWeights += 1
-                if NWeights != 0 and self.verbose == 1:
+                if NWeights != 0:
                     Utils.stdwar("We have negative weights! {0} in {1} (train)".format(NWeights, self.ListAnaSetup[i].Name))
 
         Sample = DISample(AllEvents, AllWeights, AllOutTrue, AllMultiClass, self.ListAnaSetup[0].LVars, Names)
@@ -356,24 +366,27 @@ class SampleHandler:                                                            
         vali  = DISetup.Samples["validation"]
         
         if DISetup.Name == "tttt":
-            print("The whole sample has {0} events".format(len(train.Events)))
-            print("The training sample contains {0} events".format(len(train.Events)))
+            print(str(len(train.Events)).ljust(15, " "), end="")
+            print(str(len(train.Events)).ljust(45, " "), end="")
             Yield = np.sum(train.Weights)
-        
+            print(str(Yield).ljust(15, " "))
+
         elif DISetup.Name == "NLO":
-            print("The whole sample has {0} events".format(len(test.Events) + len(vali.Events)))
-            print("The testing sample contains {0} events".format(len(test.Events)))
-            print("The validation sample contains {0} events".format(len(vali.Events)))
+            print(str(len(test.Events) + len(vali.Events)).ljust(30, " "), end="")
+            print(str(len(test.Events)).ljust(15, " "), end="")
+            print(str(len(vali.Events)).ljust(15, " "), end="")
             Yield = np.sum(test.Weights)+np.sum(vali.Weights)
-        
+            print(str(Yield).ljust(15, " "))
+
         else:
-            print("The whole sample has {0} events".format(len(train.Events) + len(test.Events) + len(vali.Events)))
-            print("The training sample contains {0} events".format(len(train.Events)))
-            print("The testing sample contains {0} events".format(len(test.Events)))
-            print("The validation sample contains {0} events".format(len(vali.Events)))
+            print(str(len(train.Events) + len(test.Events) + len(vali.Events)).ljust(15, " "), end="")
+            print(str(len(train.Events)).ljust(15, " "), end="")
+            print(str(len(test.Events)).ljust(15, " "), end="")
+            print(str(len(vali.Events)).ljust(15, " "), end="")
             Yield = np.sum(train.Weights) + np.sum(test.Weights) + np.sum(vali.Weights)
+            print(str(Yield).ljust(15, " "))
         
-        Utils.stdinfo("The total Yield amounts to: {0}".format(Yield))
+        # Utils.stdinfo("The total Yield amounts to: {0}".format(Yield))
 
         
 

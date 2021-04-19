@@ -6,10 +6,10 @@ import numpy as np
 
 class DIAnaSetup:
 
-    def __init__(self, Path, Tree, McChannel, LVars, WeightList, Name, Cuts):
+    def __init__(self, Path, Tree, MC_Channel, LVars, WeightList, Name, Cuts):
         self.Path            = Path
         self.Tree            = Tree
-        self.McChannel       = McChannel
+        self.MC_Channel       = MC_Channel
         self.LVars           = LVars
         self.WeightList      = WeightList
         self.Name            = Name
@@ -188,7 +188,7 @@ def Init(VarKind, Samples, Cuts=True):
     #   S a v e   D a t a   a s   a   D I A n a S e t u p   C l a s s   I n s t a n c e                                                                 #
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 
-    # class             | DIAnaSetup( Path,              Tree,   McChannel,                 LVars,             WeightList,  Name,             Cuts)
+    # class             | DIAnaSetup( Path,              Tree,   MC_Channel,                LVars,             WeightList,  Name,             Cuts)
     # --------------------------------------------------------------------------------------------------------------------------------------------------
     NLOSample           = DIAnaSetup( Path_tttt,         tree,   MC_Channel_NLO,            listOfVariables,   WeightNLO,   'NLO',            Cuts      )
     ttttSample          = DIAnaSetup( Path_tttt,         tree,   MC_Channel_tttt,           listOfVariables,   WeightLO,    'tttt',           Cuts      )
@@ -270,7 +270,7 @@ class DILrSchedule:                                                             
 
     def Print(self):                                                                                                                                    # Used in FNN.py[66]
         if self.mode == 'normal':
-            print("Learn rate: {0}".format(self.Lr))
+            print("   Learning Rate:".ljust(20, " ") + str(self.Lr))
         
         elif self.mode == 'drop':
             print("Inital learn rate: {0}".format(self.Lr))

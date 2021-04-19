@@ -34,9 +34,8 @@ activation = 'elu'                                                              
 if activation.replace('.','',1).isdigit():                                                                        # string.replace('a','b',#): Replace 'a' in string with 'b' #-times.
     activation = float(activation)
 
-Epochs     = 80
-Batch      = 50000
-# Neurons    = [int(num) for num in sys.argv[1].split(',')]
+Epochs     = 5
+Batch      = 1024                                                                                                 # Neurons    = [int(num) for num in sys.argv[1].split(',')]
 Neurons    = [35, 35, 35, 1]                                                                                      # Last Neuron should be 1 for FNN, 2 for TMVA, or # of classes for FNNMulti
 Dropout    = None                                                                                                 # No dropout -> None
 Regu       = 0                                                                                                    # l2
@@ -58,11 +57,12 @@ LearnRate = DIClasses.DILrSchedule('normal', 0.001)                             
 
 """ Display the properties of NN before running """
 
-Utils.stdinfo("Neurons: {}".format(Neurons))                                                                      # Uses function stdinfo from Utils.py
-Utils.stdinfo("Epochs: {0}".format(Epochs))                                                                       #    def stdinfo(message):
-Utils.stdinfo("Batch: {0}".format(Batch))                                                                         #        print(OKBLUE + message + ENDC)   OKGREEN = '\033[92m'   ENDC = '\033[0m'
-Utils.stdinfo("Dropout: {0}".format(Dropout))                                                                     # str.format(value) Returns a string with placeholder {} replaced by value.
-Utils.stdinfo("Regu: {0}".format(Regu))
+Utils.stdinfo("\nProperties of the NN:\n")
+print("   Neurons:".ljust(20, " ") + str(Neurons))                                                                      # Uses function stdinfo from Utils.py
+print("   Epochs:".ljust(20, " ")  + str(Epochs))                                                                       #    def stdinfo(message):
+print("   Batch:".ljust(20, " ")   + str(Batch))                                                                         #        print(OKBLUE + message + ENDC)   OKGREEN = '\033[92m'   ENDC = '\033[0m'
+print("   Dropout:".ljust(20, " ") + str(Dropout))                                                                     # str.format(value) Returns a string with placeholder {} replaced by value.
+print("   Regu:".ljust(20, " ")    + str(Regu))
 LearnRate.Print()
 
 
@@ -88,6 +88,9 @@ Sampler.valSize  = 0.2                                                          
 Sampler.Split    = 'EO'                                                                                           # Use EO (even odd splitting)
 Sampler.Plots    = False                                                                                          # either False, 'LO' or 'NLO's
 
+DataSet  = Sampler.GetANNInput()
+SavePath = './ANNOutput/FNN/'                                                                                     # NN output save path
+
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 #                                                                                                                 #
@@ -108,9 +111,6 @@ else:                                                                           
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 #                                                                                                                 #
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
-
-DataSet  = Sampler.GetANNInput()
-SavePath = './ANNOutput/FNN/'                                                          # NN output save path
 
 
 """BDT Network Hyperparameters"""
